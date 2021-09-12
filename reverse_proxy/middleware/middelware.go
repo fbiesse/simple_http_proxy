@@ -36,9 +36,13 @@ func ChainHttpMiddlewareAdapters(
 	h http.Handler,
 	httpMiddewareAdapters []HttpMiddewareAdapter,
 ) http.Handler {
-	for _, adapter := range httpMiddewareAdapters {
+	numberOfAdapters := len(httpMiddewareAdapters)
+	for index := numberOfAdapters - 1; index >= 0; index-- {
+		adapter := httpMiddewareAdapters[index]
 		h = adapter(h)
+
 	}
+
 	return h
 }
 
