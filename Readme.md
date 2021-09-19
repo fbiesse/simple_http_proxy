@@ -21,6 +21,7 @@ middlewares:
   - cors
   - log_request
   - dump_request
+logFile: 
 ```
 
 ## TODO

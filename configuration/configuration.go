@@ -3,6 +3,7 @@ package configuration
 type Configuration struct {
 	Server      Server
 	MiddleWares []string
+	LogFile     string
 }
 
 type Server struct {
