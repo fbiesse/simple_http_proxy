@@ -53,17 +53,27 @@ func main() {
 		uint32(listenPort),
 		stdoutLogger,
 	)
-	if config.HasMiddleware("log_request") {
-		proxy.AppendHttpMiddewareAdapter(middleware.LogRequest(&logger))
-		stdoutLogger.Println("log_request middleware enabled")
+
+	requestMiddlewares := map[string]middleware.HttpMiddewareAdapter{
+		"log_request":  middleware.LogRequest(&logger),
+		"dump_request": middleware.DumpRequest(&logger),
 	}
-	if config.HasMiddleware("dump_request") {
-		proxy.AppendHttpMiddewareAdapter(middleware.DumpRequest(&logger))
-		stdoutLogger.Println("dump_request middleware enabled")
+	responseMiddlewares := map[string]middleware.HttpResponseMiddewareAdapter{
+		"cors": middleware.Cors(),
 	}
-	if config.HasMiddleware("cors") {
-		proxy.AppendHttpResponseMiddewareAdapter(middleware.Cors())
-		stdoutLogger.Println("cors middleware enabled")
+
+	for configName, middleware := range requestMiddlewares {
+		if config.HasMiddleware(configName) {
+			proxy.AppendHttpMiddewareAdapter(middleware)
+			stdoutLogger.Printf("%s request middleware enabled\n", configName)
+		}
+	}
+
+	for configName, middleware := range responseMiddlewares {
+		if config.HasMiddleware(configName) {
+			proxy.AppendHttpResponseMiddewareAdapter(middleware)
+			stdoutLogger.Printf("%s response middleware enabled\n", configName)
+		}
 	}
 
 	proxy.Start()
